@@ -1,8 +1,30 @@
-# HEROES — High Efficiency Relationship & Opportunity Engagement System (CRM)
+# 🦸 HEROES
 
-HEROES is a modern, high-performance Lead Management System designed for agile sales teams to capture, assign, manage, and track leads through a streamlined pipeline with 24-hour SLA monitoring.
+### High Efficiency Relationship & Opportunity Engagement System
 
-Built as a deliverable for the Digital Heroes Training Hiring Assessment.
+> A modern, high-performance Lead Management System (CRM) built for agile sales teams — capture, assign, manage, and track leads through a streamlined pipeline with 24-hour SLA monitoring.
+
+Built as a deliverable for the **Digital Heroes Training Hiring Assessment**.
+
+<p align="left">
+  <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" />
+  <img alt="Node" src="https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white" />
+  <img alt="Express" src="https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white" />
+  <img alt="MongoDB" src="https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb&logoColor=white" />
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white" />
+  <img alt="Tailwind" src="https://img.shields.io/badge/TailwindCSS-v4-06B6D4?logo=tailwindcss&logoColor=white" />
+</p>
+
+---
+
+## 📖 Table of Contents
+
+- [Architecture Overview](#-architecture-overview)
+- [Key Features](#-key-features)
+- [Getting Started](#-getting-started)
+- [Demo Credentials](#-demo-credentials)
+- [API Endpoints](#-api-endpoints)
+- [Tech Stack](#-tech-stack)
 
 ---
 
@@ -50,35 +72,18 @@ HEROES/
 
 ## ✨ Key Features
 
-1. **Strict Separation of Concerns** (Backend):
-   - **Routes**: Define HTTP endpoints & middleware bindings.
-   - **Controllers**: Extract request parameters & return standardized JSON.
-   - **Services**: Domain business logic, SLA calculations, activity logging.
-   - **Repositories**: Database queries via Mongoose.
+| # | Feature | Description |
+|---|---------|--------------|
+| 1 | **Strict Separation of Concerns** | Backend follows `Routes → Controllers → Services → Repositories`, cleanly separating HTTP handling, business logic, and DB access |
+| 2 | **Feature-Based Frontend Architecture** | Every module (`auth`, `dashboard`, `landing`, `reports`) is self-contained with `api/`, `hooks/`, `services/`, `components/`, `pages/`, `utils/` |
+| 3 | **Role-Based Access Control (RBAC)** | `ADMIN` — full user management, lead deletion, role elevation • `MEMBER` — pipeline execution, assignment updates, activity notes |
+| 4 | **Public Lead Capture API** | Unauthenticated endpoint `POST /api/v1/leads/public` for external submissions |
+| 5 | **Immutable Activity & Audit Logging** | Timeline tracking every status change, reassignment, and note |
+| 6 | **24-Hour SLA Auto-Tracking** | Countdown timer from lead creation with color-coded urgency badges |
+| 7 | **Real-Time Pipeline Analytics** | Pipeline value, stage distribution, conversion metrics, rep performance charts |
+| 8 | **1-Click Demo Login** | Instant credential auto-fill for Admin & Member testing on both the landing page and login form |
 
-2. **Feature-Based Frontend Architecture**:
-   - Every module (`auth`, `dashboard`, `landing`, `reports`) is self-contained with `api/`, `hooks/`, `services/`, `components/`, `pages/`, `utils/`.
-   - Pages compose hooks + components — no API calls, no state management in pages.
-   - Hooks own React state, TanStack Query mutations, form logic, and effects.
-
-3. **Role-Based Access Control (RBAC)**:
-   - `ADMIN`: Full user management, lead deletion, role elevation.
-   - `MEMBER`: Pipeline execution, assignment updates, activity notes.
-
-4. **Public Lead Capture API**:
-   - Unauthenticated endpoint `POST /api/v1/leads/public` for external submissions.
-
-5. **Immutable Activity & Audit Logging**:
-   - Timeline tracking every status change, reassignment, and note.
-
-6. **24-Hour SLA Auto-Tracking**:
-   - Countdown timer from lead creation with color-coded urgency badges.
-
-7. **Real-Time Pipeline Analytics**:
-   - Pipeline value, stage distribution, conversion metrics, rep performance charts.
-
-8. **1-Click Demo Login**:
-   - Instant credential auto-fill for Admin & Member testing on both landing page and login form.
+**Frontend architecture principle:** Pages compose hooks + components — no API calls, no state management in pages. Hooks own React state, TanStack Query mutations, form logic, and effects.
 
 ---
 
@@ -114,7 +119,7 @@ cd client
 npm run dev       # Starts on http://localhost:5173 with Vite
 ```
 
-The Vite dev server proxies `/api` requests to `http://localhost:5000`.
+> The Vite dev server proxies `/api` requests to `http://localhost:5000`.
 
 ---
 
@@ -133,15 +138,15 @@ Additional users can be registered via `POST /api/v1/auth/register` — the firs
 
 ## 📡 API Endpoints
 
-### Auth (`/api/v1/auth`)
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/register` | No | Create user account |
-| POST | `/login` | No | Login, receive JWT |
-| GET | `/me` | Yes | Get current user profile |
-| POST | `/logout` | Yes | Clear auth session |
+### Auth `/api/v1/auth`
+| Method | Path        | Auth | Description              |
+|--------|-------------|------|--------------------------|
+| POST   | `/register` | No   | Create user account      |
+| POST   | `/login`    | No   | Login, receive JWT       |
+| GET    | `/me`       | Yes  | Get current user profile |
+| POST   | `/logout`   | Yes  | Clear auth session       |
 
-### Leads (`/api/v1/leads`)
+### Leads `/api/v1/leads`
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | POST | `/public` | No | Submit public lead |
@@ -153,14 +158,14 @@ Additional users can be registered via `POST /api/v1/auth/register` — the firs
 | DELETE | `/:id` | Admin | Delete lead |
 | POST | `/:id/notes` | Yes | Add activity note |
 
-### Users (`/api/v1/users`)
+### Users `/api/v1/users`
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/` | Yes | List workspace members |
 | PATCH | `/:id/role` | Admin | Toggle role (ADMIN/MEMBER) |
 | PATCH | `/:id/status` | Admin | Toggle status (ACTIVE/INACTIVE) |
 
-### Reports (`/api/v1/reports`)
+### Reports `/api/v1/reports`
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/` | Yes | Aggregate pipeline statistics |
@@ -171,30 +176,38 @@ Additional users can be registered via `POST /api/v1/auth/register` — the firs
 ## 💻 Tech Stack
 
 ### Frontend
-- **React 19** — UI library
-- **Vite 8** — Build tool & dev server
-- **React Router v7** — Client-side routing
-- **Tailwind CSS v4** — Utility-first styling
-- **shadcn/ui** — Radix-based component primitives
-- **TanStack Query v5** — Server state & caching
-- **GSAP** — Scroll-triggered animations
-- **Recharts** — Pipeline analytics charts
-- **Sonner** — Toast notifications
-- **Lucide React** — Icon library
-- **Axios** — HTTP client
+| Tech | Purpose |
+|---|---|
+| **React 19** | UI library |
+| **Vite 8** | Build tool & dev server |
+| **React Router v7** | Client-side routing |
+| **Tailwind CSS v4** | Utility-first styling |
+| **shadcn/ui** | Radix-based component primitives |
+| **TanStack Query v5** | Server state & caching |
+| **GSAP** | Scroll-triggered animations |
+| **Recharts** | Pipeline analytics charts |
+| **Sonner** | Toast notifications |
+| **Lucide React** | Icon library |
+| **Axios** | HTTP client |
 
 ### Backend
-- **Node.js** — Runtime
-- **Express 5** — Web framework
-- **Mongoose 9** — MongoDB ODM
-- **JWT** — Authentication
-- **BcryptJS** — Password hashing
-- **Zod** — Request validation
-- **Helmet** — Security headers
-- **Morgan** — HTTP request logging
+| Tech | Purpose |
+|---|---|
+| **Node.js** | Runtime |
+| **Express 5** | Web framework |
+| **Mongoose 9** | MongoDB ODM |
+| **JWT** | Authentication |
+| **BcryptJS** | Password hashing |
+| **Zod** | Request validation |
+| **Helmet** | Security headers |
+| **Morgan** | HTTP request logging |
 
 ### Database
 - **MongoDB** — Primary data store
 
 ### Testing
 - **Vitest** — Integration test suite (in `/tests`)
+
+---
+
+<p align="center">Built with ❤️ for the Digital Heroes Training Hiring Assessment</p>
