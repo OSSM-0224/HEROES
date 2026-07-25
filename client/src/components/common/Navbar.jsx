@@ -73,8 +73,8 @@ export const Navbar = () => {
     <TooltipProvider delayDuration={200}>
       <header
         className={`sticky top-0 z-50 w-full border-b bg-white/85 backdrop-blur-md transition-all duration-300 ${scrolled
-            ? 'border-slate-200 shadow-[0_8px_24px_-16px_rgba(15,23,42,0.25)]'
-            : 'border-slate-200/60 shadow-none'
+          ? 'border-slate-200 shadow-[0_8px_24px_-16px_rgba(15,23,42,0.25)]'
+          : 'border-slate-200/60 shadow-none'
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -134,8 +134,8 @@ export const Navbar = () => {
                     variant={location.pathname.startsWith('/dashboard') ? 'default' : 'outline'}
                     size="sm"
                     className={`gap-1.5 font-bold text-xs transition-all ${location.pathname.startsWith('/dashboard')
-                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/30'
-                        : 'border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700'
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/30'
+                      : 'border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700'
                       }`}
                   >
                     <LayoutDashboard className="w-3.5 h-3.5" />
@@ -147,8 +147,8 @@ export const Navbar = () => {
                     variant={location.pathname === '/reports' ? 'default' : 'ghost'}
                     size="sm"
                     className={`gap-1.5 font-bold text-xs ${location.pathname === '/reports'
-                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                        : 'text-slate-700 hover:text-emerald-700 hover:bg-emerald-50'
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      : 'text-slate-700 hover:text-emerald-700 hover:bg-emerald-50'
                       }`}
                   >
                     <BarChart3 className="w-3.5 h-3.5" />
