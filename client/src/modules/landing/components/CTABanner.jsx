@@ -19,10 +19,6 @@ export const CTABanner = ({ onDemoLogin }) => (
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
         </Link>
-        <Button variant="outline" size="lg" onClick={() => onDemoLogin('ADMIN')}
-          className="px-8 py-4 border-white text-white hover:bg-white/10 font-bold text-base">
-          1-Click Admin Demo
-        </Button>
       </div>
     </div>
   </section>
