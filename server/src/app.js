@@ -7,6 +7,7 @@ import { errorHandler } from './middleware/error.middleware.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import userRoutes from './modules/users/user.routes.js';
 import leadRoutes from './modules/leads/lead.routes.js';
+import reportRoutes from './modules/reports/reports.routes.js';
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get('/api/v1/health', (req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/leads', leadRoutes);
+app.use('/api/v1/reports', reportRoutes);
 
 // Error Handler
 app.use(errorHandler);

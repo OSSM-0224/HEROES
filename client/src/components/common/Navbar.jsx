@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../../services/auth.service.jsx';
-import { LogOut, LayoutDashboard, Sparkles, FileText, HelpCircle, Shield, ArrowRight } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart3, Sparkles, FileText, HelpCircle, Shield, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -82,6 +82,16 @@ export const Navbar = () => {
                   Dashboard
                 </Button>
               </Link>
+              <Link to="/reports">
+                <Button
+                  variant={location.pathname === '/reports' ? 'default' : 'ghost'}
+                  size="sm"
+                  className="gap-1.5 font-bold text-xs text-slate-700"
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  Reports
+                </Button>
+              </Link>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -107,6 +117,10 @@ export const Navbar = () => {
                   <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer text-xs font-medium">
                     <LayoutDashboard className="mr-2 h-4 w-4 text-emerald-600" />
                     <span>Dashboard</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/reports')} className="cursor-pointer text-xs font-medium">
+                    <BarChart3 className="mr-2 h-4 w-4 text-indigo-600" />
+                    <span>Reports</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-rose-600 focus:text-rose-600 cursor-pointer text-xs font-medium">

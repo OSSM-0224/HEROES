@@ -9,6 +9,7 @@ import { LoginPage } from './modules/auth/LoginPage.jsx';
 import { RegisterPage } from './modules/auth/RegisterPage.jsx';
 import { DashboardLayout } from './modules/dashboard/DashboardLayout.jsx';
 import { PublicCapturePage } from './modules/dashboard/PublicCapturePage.jsx';
+import ReportsPage from './modules/reports/pages/ReportsPage.jsx';
 
 export default function App() {
   return (
@@ -45,6 +46,15 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute>
+                  <ReportsPage />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/admin/*"
               element={
