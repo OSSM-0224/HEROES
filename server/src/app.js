@@ -12,8 +12,12 @@ import reportRoutes from './modules/reports/reports.routes.js';
 const app = express();
 
 app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));
+const allowedOrigins = config.corsOrigin
+    ? config.corsOrigin.split(',').map((origin) => origin.trim())
+    : true;
+
 app.use(cors({
-    origin: true,
+    origin: allowedOrigins,
     credentials: true,
 }));
 app.use(express.json());
