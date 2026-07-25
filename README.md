@@ -1,4 +1,4 @@
-# HEROES — Enterprise Lead Management System (CRM)
+# HEROES — High Efficiency Relationship & Opportunity Engagement System (CRM)
 
 HEROES is a modern, high-performance Lead Management System designed for agile sales teams to capture, assign, manage, and track leads through a streamlined pipeline with 24-hour SLA monitoring.
 
