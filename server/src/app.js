@@ -5,6 +5,8 @@ import morgan from 'morgan';
 import { config } from './config/env.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import authRoutes from './modules/auth/auth.routes.js';
+import userRoutes from './modules/users/user.routes.js';
+import leadRoutes from './modules/leads/lead.routes.js';
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.get('/api/v1/health', (req, res) => {
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/leads', leadRoutes);
 
 // Error Handler
 app.use(errorHandler);

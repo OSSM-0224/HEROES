@@ -1,4 +1,4 @@
-import { User } from "./auth.models.js";
+import { User } from "./auth.model.js";
 
 export const AuthRepository = {
     async findByEmail(email, includePassword = false) {
