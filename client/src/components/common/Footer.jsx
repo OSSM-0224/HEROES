@@ -33,7 +33,7 @@ export const Footer = () => {
             >
               Digital Heroes
             </a>{' '}
-            Training Assessment
+            Training Task
             <br className="hidden sm:block" />
             <span className="text-slate-400">&copy; {new Date().getFullYear()} HEROES Inc. All rights reserved.</span>
           </p>
