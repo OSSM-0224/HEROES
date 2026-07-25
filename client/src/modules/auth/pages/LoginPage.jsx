@@ -79,28 +79,6 @@ export const LoginPage = () => {
                   Preset Auth
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="text-xs font-bold justify-start h-9 px-3 bg-white border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 gap-1.5 transition-colors"
-                  onClick={() => handleQuickFill('ADMIN')}
-                >
-                  <Shield className="w-3.5 h-3.5 text-emerald-600" />
-                  Admin Demo
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="text-xs font-bold justify-start h-9 px-3 bg-white border-slate-200 hover:bg-slate-100 text-slate-700 gap-1.5 transition-colors"
-                  onClick={() => handleQuickFill('MEMBER')}
-                >
-                  <Users className="w-3.5 h-3.5 text-slate-600" />
-                  Rep Demo
-                </Button>
-              </div>
             </div>
           </CardContent>
 

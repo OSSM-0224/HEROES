@@ -4,7 +4,7 @@
 
 > A modern, high-performance Lead Management System (CRM) built for agile sales teams — capture, assign, manage, and track leads through a streamlined pipeline with 24-hour SLA monitoring.
 
-Built as a deliverable for the **Digital Heroes Training Hiring Assessment**.
+Built as a deliverable for the **Digital Heroes Training Hiring Task**.
 
 <p align="left">
   <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" />
@@ -59,13 +59,13 @@ HEROES/
 │       ├── database/           # Seed data generator
 │       ├── middleware/         # Auth verification, validation, error handling
 │       ├── utils/              # Response helpers & structured logging
-│       └── modules/            # Layered domain modules
-│           ├── auth/           # Controller → Service → Repository → Model
-│           ├── leads/          # Controller → Service → Repository → Model
-│           ├── users/          # Controller → Service → Repository → Model
-│           └── reports/        # Controller → Service + aggregation pipelines
+│   └── modules/            # Layered domain modules
+│       ├── auth/           # Controller → Service → Repository → Model
+│       ├── leads/          # Controller → Service → Repository → Model
+│       ├── users/          # Controller → Service → Repository → Model
+│       └── reports/        # Controller → Service + aggregation pipelines
 │
-└── tests/                       # Vitest integration test suite
+└── server/tests/               # Jest + Supertest integration test suite
 ```
 
 ---
@@ -120,6 +120,15 @@ npm run dev       # Starts on http://localhost:5173 with Vite
 ```
 
 > The Vite dev server proxies `/api` requests to `http://localhost:5000`.
+
+### Running Tests
+
+```bash
+cd server
+npm test               # Runs 22 integration tests (auth + leads flows)
+```
+
+Tests use **mongodb-memory-server** — no external MongoDB connection needed.
 
 ---
 
@@ -206,8 +215,10 @@ Additional users can be registered via `POST /api/v1/auth/register` — the firs
 - **MongoDB** — Primary data store
 
 ### Testing
-- **Vitest** — Integration test suite (in `/tests`)
+- **Jest 30 + Supertest** — Integration test suite (in `server/tests/`)
+- **mongodb-memory-server** — Isolated in-memory MongoDB per test run
+- **22 tests** covering authentication rules, role enforcement, lead CRUD, public lead capture, and activity notes
 
 ---
 
-<p align="center">Built with ❤️ for the Digital Heroes Training Hiring Assessment</p>
+<p align="center">Built with ❤️ for the Digital Heroes Training Hiring Task</p>
