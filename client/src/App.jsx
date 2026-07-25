@@ -4,11 +4,11 @@ import { Toaster } from 'sonner';
 import { AuthProvider } from './services/auth.service.jsx';
 import { ThemeProvider } from './services/theme.service.jsx';
 import { ProtectedRoute, GuestRoute } from './components/auth/AuthGuard.jsx';
-import { LandingPage } from './modules/landing/LandingPage.jsx';
-import { LoginPage } from './modules/auth/LoginPage.jsx';
-import { RegisterPage } from './modules/auth/RegisterPage.jsx';
-import { DashboardLayout } from './modules/dashboard/DashboardLayout.jsx';
-import { PublicCapturePage } from './modules/dashboard/PublicCapturePage.jsx';
+import { LandingPage } from './modules/landing/pages/LandingPage.jsx';
+import { LoginPage } from './modules/auth/pages/LoginPage.jsx';
+import { RegisterPage } from './modules/auth/pages/RegisterPage.jsx';
+import { DashboardLayout } from './modules/dashboard/pages/DashboardLayout.jsx';
+import { PublicCapturePage } from './modules/dashboard/pages/PublicCapturePage.jsx';
 import ReportsPage from './modules/reports/pages/ReportsPage.jsx';
 
 export default function App() {
