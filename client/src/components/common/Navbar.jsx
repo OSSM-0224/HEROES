@@ -80,9 +80,8 @@ export const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center font-black text-lg shadow-md shadow-emerald-600/30 ring-1 ring-emerald-900/10 group-hover:scale-105 group-hover:shadow-emerald-600/40 transition-all duration-300">
-                H
-                <span className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative w-9 h-9 group-hover:scale-105 transition-all duration-300">
+                <img src="/HEROES_LOGO.svg" alt="HEROES" className="w-full h-full drop-shadow-sm" />
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-black text-xl tracking-tight text-slate-900 font-heading">

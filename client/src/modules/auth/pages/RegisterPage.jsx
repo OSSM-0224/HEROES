@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, UserPlus } from 'lucide-react';
 
 export const RegisterPage = () => {
   const { name, email, password, role, error, loading, setName, setEmail, setPassword, setRole, handleSubmit } = useRegister();
@@ -18,11 +18,16 @@ export const RegisterPage = () => {
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
       <Navbar />
 
-      <main className="flex-1 flex items-center justify-center p-4 py-16">
-        <Card className="w-full max-w-md shadow-xl border-slate-200 bg-white">
+      <main className="flex-1 flex items-center justify-center p-4 py-16 relative overflow-hidden">
+        {/* Ambient background accent */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[36rem] h-[36rem] rounded-full bg-emerald-100/60 blur-3xl" />
+        </div>
+
+        <Card className="w-full max-w-md shadow-xl shadow-slate-900/5 border-slate-200 bg-white">
           <CardHeader className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-2xl bg-red-600 text-white flex items-center justify-center font-black text-xl mx-auto shadow-md shadow-indigo-500/25">
-              H
+            <div className="w-12 h-12 mx-auto">
+              <img src="/HEROES_LOGO.svg" alt="HEROES" className="w-full h-full drop-shadow-md" />
             </div>
             <CardTitle className="text-2xl font-black tracking-tight text-slate-900">Create HEROES Account</CardTitle>
             <CardDescription className="text-xs text-slate-500 font-medium">
@@ -68,7 +73,7 @@ export const RegisterPage = () => {
               <div className="space-y-1.5">
                 <Label className="text-xs font-bold text-slate-700">Account Role</Label>
                 <Select value={role} onValueChange={(val) => setRole(val)}>
-                  <SelectTrigger className="w-full bg-slate-50 border-slate-200 text-xs font-medium">
+                  <SelectTrigger className="w-full bg-slate-50 border-slate-200 text-xs font-medium focus:ring-emerald-500">
                     <SelectValue placeholder="Select Role" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-slate-200">
@@ -78,7 +83,12 @@ export const RegisterPage = () => {
                 </Select>
               </div>
 
-              <Button type="submit" loading={loading} className="w-full py-2.5 text-sm mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-500/20">
+              <Button
+                type="submit"
+                loading={loading}
+                className="w-full py-2.5 text-sm mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md shadow-emerald-600/25 gap-1.5 transition-colors"
+              >
+                <UserPlus className="w-4 h-4" />
                 Create Workspace Account
               </Button>
             </form>
@@ -87,7 +97,7 @@ export const RegisterPage = () => {
           <CardFooter className="justify-center pt-0">
             <p className="text-center text-xs text-slate-500 font-medium">
               Already registered?{' '}
-              <Link to="/login" className="font-bold text-indigo-600 hover:underline">
+              <Link to="/login" className="font-bold text-emerald-700 hover:text-emerald-800 hover:underline underline-offset-2">
                 Sign in
               </Link>
             </p>
