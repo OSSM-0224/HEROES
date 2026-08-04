@@ -2148,5 +2148,7 @@ HEROES CRM is a production-ready Lead Management System built with modern web te
 
 <br>
 
+
+
 <p align="center">Document prepared for the Digital Heroes Training Hiring Task</p>
 <p align="center">HEROES CRM v1.0.0 — July 2026</p>
