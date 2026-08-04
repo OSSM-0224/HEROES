@@ -171,6 +171,12 @@ export const Navbar = () => {
                       <div className="flex flex-col space-y-1">
                         <p className="text-xs font-bold leading-none text-slate-900">{user.name}</p>
                         <p className="text-[11px] leading-none text-slate-500">{user.email}</p>
+                        {user.organization?.name && (
+                          <p className="text-[11px] leading-none text-slate-500 flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-emerald-600" />
+                            {user.organization.name}
+                          </p>
+                        )}
                         <span className="inline-flex items-center w-fit px-1.5 py-0.5 rounded text-[10px] font-extrabold text-emerald-700 bg-emerald-50 mt-1 uppercase">
                           {user.role}
                         </span>

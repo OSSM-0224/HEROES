@@ -134,14 +134,16 @@ Tests use **mongodb-memory-server** — no external MongoDB connection needed.
 
 ## 🔑 Demo Credentials
 
-On first startup, the backend automatically seeds the database with these demo users:
+On first startup, the backend automatically seeds the database with these demo users (both belong to the **HEROES Demo** workspace):
 
 | Role | Email | Password |
 |---|---|---|
 | **Admin** | `admin@heroes.com` | `password123` |
 | **Member** | `sarah@heroes.com` | `password123` |
 
-Additional users can be registered via `POST /api/v1/auth/register` — the first registered user is automatically assigned the `ADMIN` role.
+**Multi-tenant model:** every new registration via `POST /api/v1/auth/register` provisions its own fully isolated **workspace (organization)** — the creator becomes its `ADMIN`, and all leads, members, reports, and activity are scoped to that organization. Data from one organization is never visible to another.
+
+**Legacy data migration:** on startup a non-destructive migration assigns any pre-existing users and leads (created before multi-tenancy) to a `Default Organization`, so no existing data is lost.
 
 ---
 
@@ -150,7 +152,7 @@ Additional users can be registered via `POST /api/v1/auth/register` — the firs
 ### Auth `/api/v1/auth`
 | Method | Path        | Auth | Description              |
 |--------|-------------|------|--------------------------|
-| POST   | `/register` | No   | Create user account      |
+| POST   | `/register` | No   | Create user account + isolated organization (optional `organizationName`) |
 | POST   | `/login`    | No   | Login, receive JWT       |
 | GET    | `/me`       | Yes  | Get current user profile |
 | POST   | `/logout`   | Yes  | Clear auth session       |
