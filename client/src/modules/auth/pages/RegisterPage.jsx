@@ -5,14 +5,12 @@ import { Navbar } from '../../../components/common/Navbar.jsx';
 import { Footer } from '../../../components/common/Footer.jsx';
 import { Input } from '../../../components/common/Input.jsx';
 import { Button } from '../../../components/common/Button.jsx';
-import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, UserPlus } from 'lucide-react';
+import { AlertCircle, UserPlus, Building2 } from 'lucide-react';
 
 export const RegisterPage = () => {
-  const { name, email, password, role, error, loading, setName, setEmail, setPassword, setRole, handleSubmit } = useRegister();
+  const { name, email, password, organizationName, error, loading, setName, setEmail, setPassword, setOrganizationName, handleSubmit } = useRegister();
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
@@ -29,9 +27,9 @@ export const RegisterPage = () => {
             <div className="w-12 h-12 mx-auto">
               <img src="/HEROES_LOGO.svg" alt="HEROES" className="w-full h-full drop-shadow-md" />
             </div>
-            <CardTitle className="text-2xl font-black tracking-tight text-slate-900">Create HEROES Account</CardTitle>
+            <CardTitle className="text-2xl font-black tracking-tight text-slate-900">Create Your HEROES Workspace</CardTitle>
             <CardDescription className="text-xs text-slate-500 font-medium">
-              Join your team's Lead Management workspace
+              Each workspace is fully isolated — your company's leads, members, and reports stay private.
             </CardDescription>
           </CardHeader>
 
@@ -53,7 +51,7 @@ export const RegisterPage = () => {
               />
 
               <Input
-                label="Email Address"
+                label="Work Email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -71,16 +69,19 @@ export const RegisterPage = () => {
               />
 
               <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Account Role</Label>
-                <Select value={role} onValueChange={(val) => setRole(val)}>
-                  <SelectTrigger className="w-full bg-slate-50 border-slate-200 text-xs font-medium focus:ring-emerald-500">
-                    <SelectValue placeholder="Select Role" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-slate-200">
-                    <SelectItem value="MEMBER">Member (Sales Exec / Rep)</SelectItem>
-                    <SelectItem value="ADMIN">Admin (Team Lead / Manager)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <label className="text-xs font-bold text-slate-700">Company / Workspace Name</label>
+                  <span className="text-[10px] font-medium text-slate-400">(optional)</span>
+                </div>
+                <Input
+                  value={organizationName}
+                  onChange={(e) => setOrganizationName(e.target.value)}
+                  placeholder="Acme Industries"
+                />
+                <p className="text-[11px] text-slate-400 font-medium">
+                  You'll be the ADMIN of this workspace. You can manage members and roles from the dashboard.
+                </p>
               </div>
 
               <Button

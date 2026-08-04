@@ -7,7 +7,7 @@ export const useRegister = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('MEMBER');
+  const [organizationName, setOrganizationName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -20,9 +20,14 @@ export const useRegister = () => {
     setLoading(true);
 
     try {
-      const res = await register({ name, email, password, role });
+      const res = await register({
+        name,
+        email,
+        password,
+        organizationName: organizationName.trim() || undefined,
+      });
       if (res.success) {
-        toast.success('Account created successfully!');
+        toast.success('Workspace created successfully!');
         navigate('/dashboard');
       } else {
         const msg = res.message || 'Registration failed';
@@ -42,13 +47,13 @@ export const useRegister = () => {
     name,
     email,
     password,
-    role,
+    organizationName,
     error,
     loading,
     setName,
     setEmail,
     setPassword,
-    setRole,
+    setOrganizationName,
     handleSubmit,
   };
 };
