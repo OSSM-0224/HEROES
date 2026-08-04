@@ -1,8 +1,9 @@
+import mongoose from 'mongoose';
 import { Lead } from './lead.model.js';
 
 export const LeadRepository = {
-  async findWithFilters({ search, status, priority, assignedTo, page = 1, limit = 20, sort = '-createdAt' }) {
-    const query = {};
+  async findWithFilters({ organizationId, search, status, priority, assignedTo, page = 1, limit = 20, sort = '-createdAt' }) {
+    const query = { organizationId };
 
     if (search) {
       query.$or = [
@@ -50,8 +51,8 @@ export const LeadRepository = {
     };
   },
 
-  async findById(id) {
-    return Lead.findById(id).populate('assignedTo', 'name email role');
+  async findById(id, organizationId) {
+    return Lead.findOne({ _id: id, organizationId }).populate('assignedTo', 'name email role');
   },
 
   async createLead(leadData) {
@@ -59,42 +60,47 @@ export const LeadRepository = {
     return lead.save();
   },
 
-  async updateLead(id, updateData) {
-    return Lead.findByIdAndUpdate(id, updateData, { new: true }).populate('assignedTo', 'name email role');
+  async updateLead(id, organizationId, updateData) {
+    return Lead.findOneAndUpdate({ _id: id, organizationId }, updateData, { new: true }).populate('assignedTo', 'name email role');
   },
 
-  async deleteLead(id) {
-    return Lead.findByIdAndDelete(id);
+  async deleteLead(id, organizationId) {
+    return Lead.findOneAndDelete({ _id: id, organizationId });
   },
 
-  async addNote(id, note) {
-    return Lead.findByIdAndUpdate(
-      id,
+  async addNote(id, organizationId, note) {
+    return Lead.findOneAndUpdate(
+      { _id: id, organizationId },
       { $push: { notes: note } },
       { new: true }
     ).populate('assignedTo', 'name email role');
   },
 
-  async logActivity(id, activity) {
-    return Lead.findByIdAndUpdate(
-      id,
+  async logActivity(id, organizationId, activity) {
+    return Lead.findOneAndUpdate(
+      { _id: id, organizationId },
       { $push: { activityLog: activity } },
       { new: true }
     );
   },
 
-  async getMetrics() {
-    const totalLeads = await Lead.countDocuments();
-    const newLeads = await Lead.countDocuments({ status: 'New' });
-    const wonLeads = await Lead.countDocuments({ status: 'Closed Won' });
-    const qualifiedLeads = await Lead.countDocuments({ status: 'Qualified' });
+  async getMetrics(organizationId) {
+    const orgMatch = { organizationId };
+    const orgAggregateMatch = { organizationId: new mongoose.Types.ObjectId(organizationId) };
+
+    const totalLeads = await Lead.countDocuments(orgMatch);
+    const newLeads = await Lead.countDocuments({ ...orgMatch, status: 'New' });
+    const wonLeads = await Lead.countDocuments({ ...orgMatch, status: 'Closed Won' });
+    const qualifiedLeads = await Lead.countDocuments({ ...orgMatch, status: 'Qualified' });
     
     const valueAggregation = await Lead.aggregate([
+      { $match: orgAggregateMatch },
       { $group: { _id: null, totalValue: { $sum: '$value' } } },
     ]);
     const totalPipelineValue = valueAggregation[0]?.totalValue || 0;
 
     const statusCounts = await Lead.aggregate([
+      { $match: orgAggregateMatch },
       { $group: { _id: '$status', count: { $sum: 1 } } },
     ]);
 

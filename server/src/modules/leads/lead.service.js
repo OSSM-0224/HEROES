@@ -1,20 +1,42 @@
+import { config } from '../../config/env.js';
 import { LeadRepository } from './lead.repository.js';
 import { UserRepository } from '../users/user.repository.js';
+import { OrganizationService } from '../organization/organization.service.js';
 import { NotFoundError, ForbiddenError, BadRequestError } from '../../utils/errors.js';
 
 export const LeadService = {
   async getLeads(filters, user) {
-    // If member role, allow viewing all or filtered
-    return LeadRepository.findWithFilters(filters);
+    return LeadRepository.findWithFilters({
+      ...filters,
+      organizationId: user.organizationId,
+    });
   },
 
-  async getLeadById(id) {
-    const lead = await LeadRepository.findById(id);
+  async getLeadById(id, user) {
+    const lead = await LeadRepository.findById(id, user.organizationId);
     if (!lead) throw new NotFoundError('Lead not found');
     return lead;
   },
 
-  async createLead(data, user) {
+  async resolvePublicOrganization(slug) {
+    if (slug) {
+      const organization = await OrganizationService.findBySlug(slug);
+      if (!organization) throw new NotFoundError('Organization not found');
+      return organization._id;
+    }
+    const organization = await OrganizationService.ensure({
+      name: 'HEROES Demo',
+      slug: config.publicOrgSlug,
+    });
+    return organization._id;
+  },
+
+  async createLead(data, context = {}) {
+    const { user = null, organizationId } = context;
+    if (!organizationId) {
+      throw new BadRequestError('Organization context is required');
+    }
+
     const slaDueDate = new Date();
     slaDueDate.setHours(slaDueDate.getHours() + 24); // 24hr SLA
 
@@ -25,23 +47,26 @@ export const LeadService = {
       performedByName: user ? user.name : 'Public Form',
     };
 
+    if (data.assignedTo) {
+      const assignedUser = await UserRepository.findByIdInOrg(data.assignedTo, organizationId);
+      if (!assignedUser) {
+        throw new BadRequestError('Assigned representative does not belong to your organization');
+      }
+      await UserRepository.updateLeadCount(data.assignedTo, 1);
+    }
+
     const leadData = {
       ...data,
+      organizationId,
       slaDueDate,
       activityLog: [activity],
     };
 
-    const newLead = await LeadRepository.createLead(leadData);
-
-    if (data.assignedTo) {
-      await UserRepository.updateLeadCount(data.assignedTo, 1);
-    }
-
-    return newLead;
+    return LeadRepository.createLead(leadData);
   },
 
   async updateLead(id, updateData, user) {
-    const existingLead = await LeadRepository.findById(id);
+    const existingLead = await LeadRepository.findById(id, user.organizationId);
     if (!existingLead) throw new NotFoundError('Lead not found');
 
     let activity = null;
@@ -56,6 +81,13 @@ export const LeadService = {
     }
 
     if (updateData.assignedTo !== undefined && String(updateData.assignedTo) !== String(existingLead.assignedTo?._id)) {
+      if (updateData.assignedTo) {
+        const assignedUser = await UserRepository.findByIdInOrg(updateData.assignedTo, user.organizationId);
+        if (!assignedUser) {
+          throw new BadRequestError('Assigned representative does not belong to your organization');
+        }
+      }
+
       const newAssignedUser = updateData.assignedTo ? await UserRepository.findById(updateData.assignedTo) : null;
       activity = {
         type: 'ASSIGNMENT',
@@ -74,13 +106,13 @@ export const LeadService = {
       }
     }
 
-    const updatedLead = await LeadRepository.updateLead(id, updateData);
+    const updatedLead = await LeadRepository.updateLead(id, user.organizationId, updateData);
 
     if (activity) {
-      await LeadRepository.logActivity(id, activity);
+      await LeadRepository.logActivity(id, user.organizationId, activity);
     }
 
-    return LeadRepository.findById(id);
+    return LeadRepository.findById(id, user.organizationId);
   },
 
   async deleteLead(id, user) {
@@ -88,18 +120,18 @@ export const LeadService = {
       throw new ForbiddenError('Only administrators can delete leads');
     }
 
-    const lead = await LeadRepository.findById(id);
+    const lead = await LeadRepository.findById(id, user.organizationId);
     if (!lead) throw new NotFoundError('Lead not found');
 
     if (lead.assignedTo?._id) {
       await UserRepository.updateLeadCount(lead.assignedTo._id, -1);
     }
 
-    return LeadRepository.deleteLead(id);
+    return LeadRepository.deleteLead(id, user.organizationId);
   },
 
   async addNote(id, noteText, user) {
-    const lead = await LeadRepository.findById(id);
+    const lead = await LeadRepository.findById(id, user.organizationId);
     if (!lead) throw new NotFoundError('Lead not found');
 
     const note = {
@@ -116,13 +148,13 @@ export const LeadService = {
       performedByName: user.name,
     };
 
-    await LeadRepository.addNote(id, note);
-    await LeadRepository.logActivity(id, activity);
+    await LeadRepository.addNote(id, user.organizationId, note);
+    await LeadRepository.logActivity(id, user.organizationId, activity);
 
-    return LeadRepository.findById(id);
+    return LeadRepository.findById(id, user.organizationId);
   },
 
-  async getDashboardMetrics() {
-    return LeadRepository.getMetrics();
+  async getDashboardMetrics(organizationId) {
+    return LeadRepository.getMetrics(organizationId);
   },
 };

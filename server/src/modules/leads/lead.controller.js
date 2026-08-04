@@ -25,7 +25,7 @@ export const LeadController = {
 
   async getLeadById(req, res, next) {
     try {
-      const lead = await LeadService.getLeadById(req.params.id);
+      const lead = await LeadService.getLeadById(req.params.id, req.user);
       return sendSuccess(res, 'Lead details retrieved', { lead });
     } catch (error) {
       next(error);
@@ -34,7 +34,10 @@ export const LeadController = {
 
   async createLead(req, res, next) {
     try {
-      const lead = await LeadService.createLead(req.body, req.user);
+      const lead = await LeadService.createLead(req.body, {
+        user: req.user,
+        organizationId: req.user.organizationId,
+      });
       return sendSuccess(res, 'Lead created successfully', { lead }, 201);
     } catch (error) {
       next(error);
@@ -43,10 +46,14 @@ export const LeadController = {
 
   async createPublicLead(req, res, next) {
     try {
-      const lead = await LeadService.createLead({
-        ...req.body,
-        source: 'Public Form',
-      }, null);
+      const organizationId = await LeadService.resolvePublicOrganization(req.body.organization);
+      const lead = await LeadService.createLead(
+        {
+          ...req.body,
+          source: 'Public Form',
+        },
+        { user: null, organizationId }
+      );
       return sendSuccess(res, 'Thank you! Your information has been submitted.', { lead }, 201);
     } catch (error) {
       next(error);
@@ -82,7 +89,7 @@ export const LeadController = {
 
   async getMetrics(req, res, next) {
     try {
-      const metrics = await LeadService.getDashboardMetrics();
+      const metrics = await LeadService.getDashboardMetrics(req.user.organizationId);
       return sendSuccess(res, 'Metrics retrieved', { metrics });
     } catch (error) {
       next(error);

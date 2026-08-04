@@ -1,15 +1,16 @@
 import { User } from "./auth.model.js";
+import { Organization } from "../organization/organization.model.js";
 
 export const AuthRepository = {
     async findByEmail(email, includePassword = false) {
         if (includePassword) {
             return User.findOne({ email }).select('+password');
         }
-        return User.findOne({ email });
+        return User.findOne({ email }).populate('organizationId', 'name slug');
     },
 
     async findById(id) {
-        return User.findById(id);
+        return User.findById(id).populate('organizationId', 'name slug');
     },
 
     async createUser(userData) {
@@ -19,5 +20,9 @@ export const AuthRepository = {
 
     async countUsers() {
         return User.countDocuments();
+    },
+
+    async getOrganization(organizationId) {
+        return Organization.findById(organizationId);
     }
 };

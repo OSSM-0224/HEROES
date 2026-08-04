@@ -53,6 +53,12 @@ const noteSchema = new mongoose.Schema(
 
 const leadSchema = new mongoose.Schema(
   {
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: [true, 'Organization is required'],
+      index: true,
+    },
     name: {
       type: String,
       required: [true, 'Lead name is required'],
@@ -116,7 +122,8 @@ const leadSchema = new mongoose.Schema(
 );
 
 leadSchema.index({ name: 'text', email: 'text', company: 'text' });
-leadSchema.index({ status: 1 });
-leadSchema.index({ assignedTo: 1 });
+leadSchema.index({ organizationId: 1, status: 1 });
+leadSchema.index({ organizationId: 1, assignedTo: 1 });
+leadSchema.index({ organizationId: 1, createdAt: -1 });
 
 export const Lead = mongoose.model('Lead', leadSchema);

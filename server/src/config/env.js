@@ -11,4 +11,5 @@ export const config = {
     jwtSecret: process.env.JWT_SECRET,
     jwtExpiresIn: process.env.JWT_EXPIRES_IN,
     corsOrigin: process.env.CLIENT_URL,
+    publicOrgSlug: process.env.PUBLIC_LEAD_ORGANIZATION_SLUG || 'heroes-demo',
 };

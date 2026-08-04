@@ -1,5 +1,5 @@
+import mongoose from 'mongoose';
 import { Lead } from '../leads/lead.model.js';
-import { User } from '../auth/auth.model.js';
 
 const buildDateMatch = (dateFrom, dateTo) => {
   const match = {};
@@ -15,11 +15,19 @@ const buildDateMatch = (dateFrom, dateTo) => {
   return match;
 };
 
-export const ReportsService = {
-  async getOverview({ dateFrom, dateTo }) {
-    const dateMatch = buildDateMatch(dateFrom, dateTo);
+// Aggregation pipelines do NOT cast ObjectId strings automatically, so we
+// must convert explicitly to guarantee tenant isolation.
+const toObjectId = (id) =>
+  id instanceof mongoose.Types.ObjectId ? id : new mongoose.Types.ObjectId(id);
 
-    const baseMatch = { ...dateMatch };
+const buildTenantMatch = (organizationId, dateFrom, dateTo) => ({
+  ...buildDateMatch(dateFrom, dateTo),
+  organizationId: toObjectId(organizationId),
+});
+
+export const ReportsService = {
+  async getOverview({ organizationId, dateFrom, dateTo }) {
+    const baseMatch = buildTenantMatch(organizationId, dateFrom, dateTo);
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const weekStart = new Date();
@@ -85,7 +93,7 @@ export const ReportsService = {
     const slaCompliance = slaTotal > 0 ? Number((((slaTotal - slaBreached) / slaTotal) * 100).toFixed(1)) : 100;
 
     const avgResponseTime = await Lead.aggregate([
-      { $match: { ...dateMatch, activityLog: { $elemMatch: { type: 'LEAD_CREATED' } } } },
+      { $match: { ...baseMatch, activityLog: { $elemMatch: { type: 'LEAD_CREATED' } } } },
       { $project: { firstActivity: { $arrayElemAt: ['$activityLog', 0] }, createdAt: 1 } },
       { $project: { responseTime: { $subtract: ['$firstActivity.createdAt', '$createdAt'] } } },
       { $group: { _id: null, avgMs: { $avg: '$responseTime' } } },
@@ -110,8 +118,8 @@ export const ReportsService = {
     };
   },
 
-  async getStatusDistribution({ dateFrom, dateTo }) {
-    const match = buildDateMatch(dateFrom, dateTo);
+  async getStatusDistribution({ organizationId, dateFrom, dateTo }) {
+    const match = buildTenantMatch(organizationId, dateFrom, dateTo);
     const result = await Lead.aggregate([
       { $match: match },
       { $group: { _id: '$status', count: { $sum: 1 } } },
@@ -120,8 +128,8 @@ export const ReportsService = {
     return result.map((r) => ({ status: r._id, count: r.count }));
   },
 
-  async getSourceAnalytics({ dateFrom, dateTo }) {
-    const match = buildDateMatch(dateFrom, dateTo);
+  async getSourceAnalytics({ organizationId, dateFrom, dateTo }) {
+    const match = buildTenantMatch(organizationId, dateFrom, dateTo);
     const result = await Lead.aggregate([
       { $match: match },
       { $group: { _id: '$source', count: { $sum: 1 } } },
@@ -130,8 +138,8 @@ export const ReportsService = {
     return result.map((r) => ({ source: r._id, count: r.count }));
   },
 
-  async getTrend({ dateFrom, dateTo, groupBy = 'day' }) {
-    const match = buildDateMatch(dateFrom, dateTo);
+  async getTrend({ organizationId, dateFrom, dateTo, groupBy = 'day' }) {
+    const match = buildTenantMatch(organizationId, dateFrom, dateTo);
     let dateFormat;
     if (groupBy === 'month') {
       dateFormat = { $dateToString: { format: '%Y-%m', date: '$createdAt' } };
@@ -149,8 +157,8 @@ export const ReportsService = {
     return result.map((r) => ({ date: r._id, count: r.count }));
   },
 
-  async getPriorityDistribution({ dateFrom, dateTo }) {
-    const match = buildDateMatch(dateFrom, dateTo);
+  async getPriorityDistribution({ organizationId, dateFrom, dateTo }) {
+    const match = buildTenantMatch(organizationId, dateFrom, dateTo);
     const result = await Lead.aggregate([
       { $match: match },
       { $group: { _id: '$priority', count: { $sum: 1 } } },
@@ -159,8 +167,9 @@ export const ReportsService = {
     return result.map((r) => ({ priority: r._id, count: r.count }));
   },
 
-  async getUserPerformance({ dateFrom, dateTo }) {
-    const match = buildDateMatch(dateFrom, dateTo);
+  async getUserPerformance({ organizationId, dateFrom, dateTo }) {
+    const match = buildTenantMatch(organizationId, dateFrom, dateTo);
+    const orgObjectId = toObjectId(organizationId);
 
     const result = await Lead.aggregate([
       { $match: { ...match, assignedTo: { $ne: null } } },
@@ -175,8 +184,16 @@ export const ReportsService = {
       {
         $lookup: {
           from: 'users',
-          localField: '_id',
-          foreignField: '_id',
+          let: { userId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$_id', '$$userId'] },
+                organizationId: orgObjectId,
+              },
+            },
+            { $project: { name: 1, email: 1, role: 1 } },
+          ],
           as: 'user',
         },
       },
@@ -206,8 +223,10 @@ export const ReportsService = {
     return result;
   },
 
-  async getRecentActivity({ dateFrom, dateTo, limit = 20 }) {
-    const match = buildDateMatch(dateFrom, dateTo);
+  async getRecentActivity({ organizationId, dateFrom, dateTo, limit = 20 }) {
+    const match = buildTenantMatch(organizationId, dateFrom, dateTo);
+    const orgObjectId = toObjectId(organizationId);
+
     const result = await Lead.aggregate([
       { $match: match },
       { $unwind: '$activityLog' },
@@ -216,8 +235,16 @@ export const ReportsService = {
       {
         $lookup: {
           from: 'users',
-          localField: 'activityLog.performedBy',
-          foreignField: '_id',
+          let: { performerId: '$activityLog.performedBy' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$_id', '$$performerId'] },
+                organizationId: orgObjectId,
+              },
+            },
+            { $project: { name: 1 } },
+          ],
           as: 'performer',
         },
       },
@@ -239,8 +266,11 @@ export const ReportsService = {
     return result;
   },
 
-  async getExportData({ dateFrom, dateTo, format = 'csv' }) {
-    const match = buildDateMatch(dateFrom, dateTo);
+  async getExportData({ organizationId, dateFrom, dateTo, format = 'csv' }) {
+    const match = {
+      ...buildDateMatch(dateFrom, dateTo),
+      organizationId,
+    };
     const leads = await Lead.find(match)
       .populate('assignedTo', 'name email')
       .sort({ createdAt: -1 })

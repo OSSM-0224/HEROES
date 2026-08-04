@@ -1,12 +1,20 @@
 import { User } from '../auth/auth.model.js';
 
 export const UserRepository = {
-  async findAll() {
-    return User.find().select('-password').sort({ createdAt: -1 });
+  async findAll(organizationId) {
+    return User.find({ organizationId }).select('-password').sort({ createdAt: -1 });
   },
 
   async findById(id) {
     return User.findById(id).select('-password');
+  },
+
+  async findByIdInOrg(id, organizationId) {
+    return User.findOne({ _id: id, organizationId }).select('-password');
+  },
+
+  async countAdminsInOrg(organizationId) {
+    return User.countDocuments({ organizationId, role: 'ADMIN', status: 'ACTIVE' });
   },
 
   async updateRole(id, role) {

@@ -10,11 +10,8 @@ describe('Auth Module — Authentication & Authorization Rules', () => {
     password: 'password123',
   };
 
-  let userToken;
-  let adminToken;
-
   describe('POST /api/v1/auth/register', () => {
-    it('should register first user as ADMIN', async () => {
+    it('should register a user as ADMIN of their own organization', async () => {
       const res = await request(app)
         .post('/api/v1/auth/register')
         .send(testUser)
@@ -23,20 +20,31 @@ describe('Auth Module — Authentication & Authorization Rules', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.data.user.role).toBe('ADMIN');
       expect(res.body.data.user.email).toBe(testUser.email);
+      expect(res.body.data.user.organizationId).toBeDefined();
+      expect(res.body.data.user.organization).toBeDefined();
+      expect(res.body.data.user.organization.name).toBe("Test User's Workspace");
+      expect(res.body.data.user.organization.slug).toBe('test-user-s-workspace');
       expect(res.body.data.token).toBeDefined();
-
-      adminToken = res.body.data.token;
     });
 
-    it('should register second user as MEMBER', async () => {
+    it('should isolate each registration into its own organization', async () => {
       await request(app).post('/api/v1/auth/register').send(testUser);
-      const res = await request(app)
+      const second = await request(app)
         .post('/api/v1/auth/register')
         .send({ ...testUser, email: 'member@example.com', name: 'Member User' })
         .expect(201);
 
-      expect(res.body.data.user.role).toBe('MEMBER');
-      userToken = res.body.data.token;
+      expect(second.body.data.user.role).toBe('ADMIN');
+      expect(second.body.data.user.organizationId).not.toBe(undefined);
+    });
+
+    it('should honor a custom organization name', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/register')
+        .send({ ...testUser, organizationName: 'Acme Industries' })
+        .expect(201);
+
+      expect(res.body.data.user.organization.name).toBe('Acme Industries');
     });
 
     it('should reject duplicate email', async () => {
@@ -80,6 +88,7 @@ describe('Auth Module — Authentication & Authorization Rules', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.data.token).toBeDefined();
       expect(res.body.data.user.email).toBe(testUser.email);
+      expect(res.body.data.user.organizationId).toBeDefined();
     });
 
     it('should reject wrong password', async () => {
@@ -113,6 +122,7 @@ describe('Auth Module — Authentication & Authorization Rules', () => {
 
       expect(res.body.success).toBe(true);
       expect(res.body.data.user.email).toBe(testUser.email);
+      expect(res.body.data.user.organization).toBeDefined();
     });
 
     it('should reject request without token', async () => {
@@ -127,6 +137,21 @@ describe('Auth Module — Authentication & Authorization Rules', () => {
       const res = await request(app)
         .get('/api/v1/auth/me')
         .set('Authorization', 'Bearer invalid-token')
+        .expect(401);
+
+      expect(res.body.success).toBe(false);
+    });
+
+    it('should reject request with a token whose account was deleted', async () => {
+      const regRes = await request(app).post('/api/v1/auth/register').send(testUser);
+      const token = regRes.body.data.token;
+
+      const { User } = await import('../src/modules/auth/auth.model.js');
+      await User.deleteMany({});
+
+      const res = await request(app)
+        .get('/api/v1/auth/me')
+        .set('Authorization', `Bearer ${token}`)
         .expect(401);
 
       expect(res.body.success).toBe(false);

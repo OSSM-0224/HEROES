@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema(
             required: [true, 'Password is required'],
             select: false,
         },
+        organizationId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Organization',
+            required: [true, 'Organization is required'],
+            index: true,
+        },
         role: {
             type: String,
             enum: ['ADMIN', 'MEMBER'],

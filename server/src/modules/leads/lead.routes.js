@@ -18,6 +18,7 @@ const createLeadSchema = {
     source: z.string().optional(),
     assignedTo: z.string().nullable().optional(),
     tags: z.array(z.string()).optional(),
+    organization: z.string().optional(),
   }),
 };
 

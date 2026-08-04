@@ -1,23 +1,42 @@
 import { AuthRepository } from './auth.respository.js';
+import { OrganizationService } from '../organization/organization.service.js';
 import { generateToken } from '../../config/jwt.js';
 import { BadRequestError, UnauthorizedError, NotFoundError } from '../../utils/errors.js';
 
+const serializeUser = (user, organization) => ({
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    status: user.status,
+    organizationId: user.organizationId?.toString(),
+    organization: organization
+        ? {
+              id: organization._id.toString(),
+              name: organization.name,
+              slug: organization.slug,
+          }
+        : null,
+});
+
 export const AuthService = {
-    async register({ name, email, password, role }) {
+    async register({ name, email, password, organizationName }) {
         const existing = await AuthRepository.findByEmail(email);
         if (existing) {
             throw new BadRequestError('User with this email already exists');
         }
 
-        const totalCount = await AuthRepository.countUsers();
-        // First registered user is automatically ADMIN
-        const assignedRole = totalCount === 0 ? 'ADMIN' : (role || 'MEMBER');
+        // Every new registration creates its own isolated organization/workspace.
+        const organization = await OrganizationService.create({
+            name: organizationName || `${name}'s Workspace`,
+        });
 
         const user = await AuthRepository.createUser({
             name,
             email,
             password,
-            role: assignedRole,
+            role: 'ADMIN', // Workspace creator is always the ADMIN of their own organization
+            organizationId: organization._id,
         });
 
         const token = generateToken({
@@ -25,16 +44,11 @@ export const AuthService = {
             email: user.email,
             name: user.name,
             role: user.role,
+            organizationId: user.organizationId.toString(),
         });
 
         return {
-            user: {
-                id: user._id.toString(),
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                status: user.status,
-            },
+            user: serializeUser(user, organization),
             token,
         };
     },
@@ -59,31 +73,21 @@ export const AuthService = {
             email: user.email,
             name: user.name,
             role: user.role,
+            organizationId: user.organizationId.toString(),
         });
 
         return {
-            user: {
-                id: user._id.toString(),
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                status: user.status,
-            },
+            user: serializeUser(user, await AuthRepository.getOrganization(user.organizationId)),
             token,
         };
     },
+
     async getCurrentUser(userId) {
         const user = await AuthRepository.findById(userId);
         if (!user) {
             throw new NotFoundError('User not found');
         }
 
-        return {
-            id: user._id.toString(),
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            status: user.status,
-        };
+        return serializeUser(user, user.organizationId);
     },
 };
